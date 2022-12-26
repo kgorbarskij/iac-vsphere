@@ -1,7 +1,7 @@
 ## APP
 
 An example application that is used as an example in the CI / CD pipeline
-Docker file компилирует и упаковывает исходный код в контейнер, который далее разворачивается при помощи инфраструктуры terrafor/kubernetes/jenkins
+Docker file compiles and packages the source code into a container, which is then deployed using the terrafor/kubernetes/jenkins infrastructure
 
 ## 2048 GAME 🕹
 

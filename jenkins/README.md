@@ -1,7 +1,7 @@
 ## CI/CD
 
 Describe the process of building and delivering applications using Jenkins.
-The pipeline is started with a webhook initialized by git. Git repository specified by _github_ variable <br>
+The pipeline is started with a webhook initialized by git. Git repository specified by **github** variable <br>
 
 - Using the kubernetes cluster agents, an image is formed from the source code located in the apps folder using the Dockerfile and stored in the registry.
 - Testing phase in progress
