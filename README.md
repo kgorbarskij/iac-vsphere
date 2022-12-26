@@ -10,11 +10,10 @@ The repository contains a number of methods and templates used to fully initiali
 
 ## Description
 
-The infrastructure is deployed based on VSphere ESXI 6.5+. [Terraform]() initializes deployment of virtual hosts from prepared Ubuntu20.04 templates configured with [Packer](). Next, the k8s cluster is deployed using [Kubespray](). Kubernetes cluster already contains the minimum required settings for using CI / CD based on Jenkins.
+The infrastructure is deployed based on VSphere ESXI 6.5+. [Terraform](https://github.com/kgorbarskij/iac-vsphere/tree/main/terraform/vmware/k8s-cluster) initializes deployment of virtual hosts from prepared Ubuntu20.04 templates configured with [Packer](https://github.com/kgorbarskij/iac-vsphere/tree/main/packer/ubuntu2004). Next, the k8s cluster is deployed using [Kubespray](https://github.com/kgorbarskij/iac-vsphere/tree/main/kubespray). Kubernetes cluster already contains the minimum required settings for using CI / CD based on Jenkins.
 Using Load Balancer with [metalLB](https://metallb.org/) and workload scaling with [Horizontal Pod Autoscaling
-](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) Application source code is stored in the [apps]() folder. [Jenkins]() is configured to build applications using [Docker](https://www.
-docker.com) files and storing the result in the registry. Application deployment happens by running a Docker image in a kubernetes cluster. Notification about the result of the assembly occurs using the telegram bot.
+](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) Application source code is stored in the [apps](https://github.com/kgorbarskij/iac-vsphere/tree/main/apps) folder. [Jenkins](https://github.com/kgorbarskij/iac-vsphere/tree/main/jenkins) is configured to build applications using [Docker](https://www.docker.com) files and storing the result in the registry. Application deployment happens by running a Docker image in a kubernetes cluster. Notification about the result of the assembly occurs using the telegram bot.
 
 ## Initialization
 
-- To initialize the whole process (deploying the infrastructure, building and running applications), you must specify all the dependencies in the configuration files and apply the [terraform]() file.
+- To initialize the whole process (deploying the infrastructure, building and running applications), you must specify all the dependencies in the configuration files and apply the [terraform](https://github.com/kgorbarskij/iac-vsphere/tree/main/terraform/vmware/k8s-cluster) file.

@@ -2,7 +2,7 @@
 
 ## Start
 
-Configured by default for deployment by applying the inventory file in the kubespray/inventory/k8s/inventory.ini folder, which is generated from the [terraform]() template at the virtual hosts initialization stage
+Configured by default for deployment by applying the inventory file in the kubespray/inventory/k8s/inventory.ini folder, which is generated from the [terraform](https://github.com/kgorbarskij/iac-vsphere/tree/main/terraform/vmware/k8s-cluster) template at the virtual hosts initialization stage
 
 If necessary, you can override the variables in the kubespray/inventory/k8s/all folder and
 kubespray/inventory/k8s/k8s_cluster

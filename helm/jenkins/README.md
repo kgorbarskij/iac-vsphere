@@ -1,6 +1,6 @@
 # Install Jenkins with Helm
 
-- The Jenkins installation is initialized in kubernetes using [terraform]() after configuring all the necessary infrastructure in the form of virtual hosts and a kubernetes cluster.
+- The Jenkins installation is initialized in kubernetes using [terraform](https://github.com/kgorbarskij/iac-vsphere/tree/main/terraform/vmware/k8s-cluster) after configuring all the necessary infrastructure in the form of virtual hosts and a kubernetes cluster.
 
 - By default, Jenkins stores all its data on the selected node using PersistentVolume
 - Has access through port 80 configured as a service. To access by DNS name, you need to define a variable in jenkins-value.yaml
@@ -14,4 +14,4 @@
   - Job DSL
   - Job Import
 
-All settings can be changed/added/removed by redefining variables in the jenkins-values.yaml and jenkins.yaml files prior to [terraform]() initialization
+All settings can be changed/added/removed by redefining variables in the jenkins-values.yaml and jenkins.yaml files prior to [terraform](https://github.com/kgorbarskij/iac-vsphere/tree/main/terraform/vmware/k8s-cluster) initialization
