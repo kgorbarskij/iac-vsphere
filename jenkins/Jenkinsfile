@@ -1,0 +1,123 @@
+#!groovy
+def github = 'https://github.com/kgorbarskij/test.git'
+def GitCommit
+
+properties([disableConcurrentBuilds()])
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            jenkins/kube-default: true
+            app: jenkins
+            component: agent
+        spec:
+          containers:
+            - name: jnlp
+              image: jenkins/jnlp-agent-docker
+              resources:
+                limits:
+                  cpu: 1
+                  memory: 2Gi
+                requests:
+                  cpu: 1
+                  memory: 2Gi
+              imagePullPolicy: Always
+              env:
+              - name: POD_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.podIP
+              - name: DOCKER_HOST
+                value: tcp://localhost:2375
+            - name: dind
+              image: docker:18.05-dind
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: dind-storage
+                  mountPath: /var/lib/docker
+          volumes:
+            - name: dind-storage
+              emptyDir: {}
+        '''
+    }
+  }
+    stages {
+        stage("Docker build") {
+            steps {
+                echo "This is a $STAGE_NAME stage " 
+                script {
+                    GitCommit = sh(label: 'Short Git Commit', returnStdout: true, script: 'git rev-parse --short=7 HEAD').trim()
+                }
+                container('dind') {
+                    dir ('apps/2048'){
+                        withCredentials([usernamePassword(credentialsId: 'kgorbarskij_dhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            sh """
+                            docker login -u $USERNAME -p $PASSWORD
+                            docker build -t kgorbarskij/2048:$GitCommit .
+                            docker push kgorbarskij/2048:$GitCommit
+                            """
+                        }    
+                    }
+                }    
+            }
+        }
+        stage('Test') { 
+            steps {
+                echo "This is a $STAGE_NAME stage " 
+                echo "echo done :) "
+            }
+        }    
+ 
+        stage('Deploy') {
+            steps {
+                echo "This is a $STAGE_NAME stage " 
+                dir ('k8s/2048'){
+                    script {
+                        sshagent(credentials: ['ubuntu_ssl']) {
+                        sh """#!/bin/bash
+                        ssh -o StrictHostKeyChecking=no ubuntu@192.168.1.215 '
+                        git clone $github
+                        cd test
+                        git fetch
+                        git reset --hard HEAD
+                        git merge origin
+                        cd k8s/2048
+                        export tag=$GitCommit
+                        chmod +x sed.sh
+                        ./sed.sh
+                        kubectl apply -f deployment.yaml
+                        '
+                        """
+                    }
+                  }
+               }  
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Post success..'
+            withCredentials([string(credentialsId: 'token_jenkins_bot', variable: 'token_jenkins_bot'), string(credentialsId: 'cahtid_brs', variable: 'cahtid_brs')]) {
+            sh  ("""
+            curl -s -X POST https://api.telegram.org/bot${token_jenkins_bot}/sendMessage -d chat_id=${cahtid_brs} -d parse_mode=markdown -d text='*${env.JOB_NAME}* : *Branch*: ${env.GIT_BRANCH} *Build* : OK *Published* = YES'
+            """)
+            cleanWs()
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'token_jenkins_bot', variable: 'token_jenkins_bot'), string(credentialsId: 'cahtid_brs', variable: 'cahtid_brs')]) {
+            sh  ("""
+                curl -s -X POST https://api.telegram.org/bot${token_jenkins_bot}/sendMessage -d chat_id=${cahtid_brs} -d parse_mode=markdown -d text='*${env.JOB_NAME}* : POC  *Branch*: ${env.GIT_BRANCH} *Build* : `not OK` *Published* = `no`'
+            """)
+            cleanWs()
+            }
+        }
+    }
+}
